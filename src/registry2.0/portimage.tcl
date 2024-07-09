@@ -490,7 +490,7 @@ proc extract_archive_to_imagedir {location} {
                     throw MACPORTS "No '$pax' was found on this system!"
                 }
             }
-            t(ar|bz|lz|xz|gz) {
+            t(ar|bz|lz|xz|gz|zst|lrzip) {
                 # Opportunistic HFS compression. bsdtar will automatically
                 # disable this if filesystem does not support compression.
                 # Don't use if not running as root, due to bugs:
@@ -514,7 +514,7 @@ proc extract_archive_to_imagedir {location} {
                     set unarchive.pre_args {-xvpf}
                 }
 
-                if {[regexp {z2?$} ${unarchive.type}]} {
+                if {[regexp {z([24o]|ip|st)?$} ${unarchive.type}]} {
                     set unarchive.args {-}
                     if {[regexp {bz2?$} ${unarchive.type}]} {
                         if {![catch {macports::binaryInPath lbzip2}]} {
@@ -528,6 +528,16 @@ proc extract_archive_to_imagedir {location} {
                         set gzip "lzma"
                     } elseif {[regexp {xz$} ${unarchive.type}]} {
                         set gzip "xz"
+                    } elseif {[regexp {lzip$} ${unarchive.type}]} {
+                        set gzip "lzip"
+                    } elseif {[regexp {lzo$} ${unarchive.type}]} {
+                        set gzip "lzop"
+                    } elseif {[regexp {lz4$} ${unarchive.type}]} {
+                        set gzip "lz4"
+                    } elseif {[regexp {zst$} ${unarchive.type}]} {
+                        set gzip "zstd"
+                    } elseif {[regexp {lrzip$} ${unarchive.type}]} {
+                        set gzip "lrzip"
                     } else {
                         set gzip "gzip"
                     }

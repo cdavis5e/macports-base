@@ -120,13 +120,13 @@ proc portinstall::create_archive {location archive.type} {
                 return -code error "No '$pax' was found on this system!"
             }
         }
-        t(ar|bz|lz|xz|gz|mptar) {
+        t(ar|bz|lz|xz|lzip|lzo|lz4|zst|lrzip|gz|mptar) {
             set tar "tar"
             if {[catch {set tar [findBinary $tar ${portutil::autoconf::tar_path}]} errmsg] == 0} {
                 ui_debug "Using $tar"
                 set archive.cmd "$tar"
                 set archive.pre_args {-cvf}
-                if {[regexp {z2?$} ${archive.type}]} {
+                if {[regexp {z([24o]|ip|st)?$} ${archive.type}]} {
                     if {[regexp {bz2?$} ${archive.type}]} {
                         if {![catch {binaryInPath lbzip2}]} {
                             set gzip "lbzip2"
@@ -142,6 +142,21 @@ proc portinstall::create_archive {location archive.type} {
                     } elseif {[regexp {xz$} ${archive.type}]} {
                         set gzip "xz"
                         set level 6
+                    } elseif {[regexp {lzip$} ${archive.type}]} {
+                        set gzip "lzip"
+                        set level 6
+                    } elseif {[regexp {lzo$} ${archive.type}]} {
+                        set gzip "lzop"
+                        set level 3
+                    } elseif {[regexp {lz4$} ${archive.type}]} {
+                        set gzip "lz4"
+                        set level 9
+                    } elseif {[regexp {zst$} ${archive.type}]} {
+                        set gzip "zstd"
+                        set level 12
+                    } elseif {[regexp {lrzip$} ${archive.type}]} {
+                        set gzip "lrzip"
+                        set level ""
                     } else {
                         set gzip "gzip"
                         set level 9

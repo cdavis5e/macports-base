@@ -2141,6 +2141,21 @@ proc macports::get_tar_flags {suffix} {
         .tlz {
             return "--use-compress-program [findBinary lzma {}] -"
         }
+        .tlzip {
+            return "--use-compress-program [findBinary lzip {}] -"
+        }
+        .tlzo {
+            return "--use-compress-program [findBinary lzop {}] -"
+        }
+        .tlz4 {
+            return "--use-compress-program [findBinary lz4 {}] -"
+        }
+        .tzst {
+            return "--use-compress-program [findBinary zstd {}] -"
+        }
+        .tlrzip {
+            return "--use-compress-program [findBinary lrzip {}] -"
+        }
         default {
             return -
         }

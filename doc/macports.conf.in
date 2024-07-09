@@ -55,7 +55,8 @@ variants_conf       	@MPCONFIGDIR_EXPANDED@/variants.conf
 #buildfromsource     	ifneeded
 
 # Type of archive to use for port images created by local builds.
-# Supported types are cpgz, cpio, tar, tbz, tbz2, tgz, tlz, txz, xar, zip.
+# Supported types are cpgz, cpio, tar, tbz, tbz2, tgz, tlz, txz, tlzip, tlzo,
+# tlz4, tzst, tlrzip, xar, zip.
 #portarchivetype     	tbz2
 
 # How to store port images.

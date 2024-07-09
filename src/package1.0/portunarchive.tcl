@@ -180,13 +180,13 @@ proc portunarchive::unarchive_command_setup {args} {
                 return -code error "No '$pax' was found on this system!"
             }
         }
-        t(ar|bz|lz|xz|gz) {
+        t(ar|bz|lz|xz|gz|zst|lrzip) {
             set tar "tar"
             if {[catch {set tar [findBinary $tar ${portutil::autoconf::tar_path}]} errmsg] == 0} {
                 ui_debug "Using $tar"
                 set unarchive.cmd "$tar"
                 set unarchive.pre_args {-xvpf}
-                if {[regexp {z2?$} ${unarchive.type}]} {
+                if {[regexp {z([24o]|ip|st)?$} ${unarchive.type}]} {
                     set unarchive.args {-}
                     if {[regexp {bz2?$} ${unarchive.type}]} {
                         if {![catch {binaryInPath lbzip2}]} {
@@ -200,6 +200,16 @@ proc portunarchive::unarchive_command_setup {args} {
                         set gzip "lzma"
                     } elseif {[regexp {xz$} ${unarchive.type}]} {
                         set gzip "xz"
+                    } elseif {[regexp {lzip$} ${unarchive.type}]} {
+                        set gzip "lzip"
+                    } elseif {[regexp {lzo$} ${unarchive.type}]} {
+                        set gzip "lzop"
+                    } elseif {[regexp {lz4$} ${unarchive.type}]} {
+                        set gzip "lz4"
+                    } elseif {[regexp {zst$} ${unarchive.type}]} {
+                        set gzip "zstd"
+                    } elseif {[regexp {lrzip$} ${unarchive.type}]} {
+                        set gzip "lrzip"
                     } else {
                         set gzip "gzip"
                     }

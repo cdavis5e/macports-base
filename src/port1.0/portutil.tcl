@@ -2681,7 +2681,7 @@ proc supportedArchiveTypes {} {
     global supported_archive_types
     if {![info exists supported_archive_types]} {
         set supported_archive_types [list]
-        foreach type [list tbz2 tbz tgz tar txz tlz xar zip cpgz cpio aar] {
+        foreach type [list tbz2 tbz tgz tar txz tlz tlzip tlzo tlz4 tzst tlrzip xar zip cpgz cpio aar] {
             if {[catch {archiveTypeIsSupported $type}] == 0} {
                 lappend supported_archive_types $type
             }
@@ -2736,16 +2736,26 @@ proc archiveTypeIsSupported {type} {
                 }
             }
         }
-        t(ar|bz|lz|xz|gz) {
+        t(ar|bz|lz|xz|lzip|lzo|lz4|zst|lrzip|gz) {
             set tar "tar"
             if {[catch {set tar [findBinary $tar ${portutil::autoconf::tar_path}]} errmsg] == 0} {
-                if {[regexp {z2?$} $type]} {
+                if {[regexp {z([24o]|ip|st)?$} $type]} {
                     if {[regexp {bz2?$} $type]} {
                         set gzip "bzip2"
                     } elseif {[regexp {lz$} $type]} {
                         set gzip "lzma"
                     } elseif {[regexp {xz$} $type]} {
                         set gzip "xz"
+                    } elseif {[regexp {lzip$} $type]} {
+                        set gzip "lzip"
+                    } elseif {[regexp {lzo$} $type]} {
+                        set gzip "lzop"
+                    } elseif {[regexp {lz4$} $type]} {
+                        set gzip "lz4"
+                    } elseif {[regexp {zst$} $type]} {
+                        set gzip "zstd"
+                    } elseif {[regexp {lrzip$} $type]} {
+                        set gzip "lrzip"
                     } else {
                         set gzip "gzip"
                     }
@@ -2820,6 +2830,21 @@ proc extract_archive_metadata {archive_location archive_type metadata_types} {
         }
         tlz {
             set raw_contents [exec -ignorestderr [findBinary tar ${portutil::autoconf::tar_path}] -xO${qflag}f $archive_location --use-compress-program [findBinary lzma ""] ./+CONTENTS]
+        }
+        tlzip {
+            set raw_contents [exec -ignorestderr [findBinary tar ${portutil::autoconf::tar_path}] -xO${qflag}f $archive_location --use-compress-program [findBinary lzip ""] ./+CONTENTS]
+        }
+        tlzo {
+            set raw_contents [exec -ignorestderr [findBinary tar ${portutil::autoconf::tar_path}] -xO${qflag}f $archive_location --use-compress-program [findBinary lzop ""] ./+CONTENTS]
+        }
+        tlz4 {
+            set raw_contents [exec -ignorestderr [findBinary tar ${portutil::autoconf::tar_path}] -xO${qflag}f $archive_location --use-compress-program [findBinary lz4 ""] ./+CONTENTS]
+        }
+        tzst {
+            set raw_contents [exec -ignorestderr [findBinary tar ${portutil::autoconf::tar_path}] -xO${qflag}f $archive_location --use-compress-program [findBinary zstd ""] ./+CONTENTS]
+        }
+        tlrzip {
+            set raw_contents [exec -ignorestderr [findBinary tar ${portutil::autoconf::tar_path}] -xO${qflag}f $archive_location --use-compress-program [findBinary lrzip ""] ./+CONTENTS]
         }
         xar {
             system -W ${tempdir} "[findBinary xar ${portutil::autoconf::xar_path}] -xf [shellescape $archive_location] +CONTENTS"
