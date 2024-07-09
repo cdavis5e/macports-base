@@ -431,14 +431,19 @@ proc portconfigure::configure_start {args} {
 # configure.universal_archs based on supported_archs and build_arch or
 # universal_archs, plus the SDK being used
 proc portconfigure::choose_supported_archs {archs} {
-    global supported_archs configure.sdk_version
+    global supported_archs configure.sdk_version configure.sdkroot
 
     if {${configure.sdk_version} ne ""} {
         # Figure out which archs are supported by the SDK
         if {[vercmp ${configure.sdk_version} 11] >= 0} {
             set sdk_archs [list arm64 x86_64]
+        } elseif {[vercmp ${configure.sdk_version} 10.15] >= 0} {
+            set sdk_archs [list x86_64]
         } elseif {[vercmp ${configure.sdk_version} 10.14] >= 0} {
             set sdk_archs [list x86_64]
+            if {${configure.sdkroot} eq "" || ${configure.sdkroot} eq "/"} {
+                lappend sdk_archs i386
+            }
         } elseif {[vercmp ${configure.sdk_version} 10.7] >= 0} {
             set sdk_archs [list x86_64 i386]
         } elseif {[vercmp ${configure.sdk_version} 10.6] >= 0} {
